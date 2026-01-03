@@ -1,8 +1,11 @@
 // ==UserScript==
-// @name Mastodon - threaded replies
-// @match https://mastodon.social/*
-// @match https://fosstodon.org/*
+// @name Mastodon - threaded replies 2.2.1 (edit for glitch-soc)
+// @match https://infosec.exchange/*
+// @match https://toot.cat/*
+// @match https://tilde.zone/*
 // @version 2.2.1
+// @description  Threaded replies for Mastodon
+// @source https://github.com/afontenot/userjs/blob/main/mastodon/mastodon-threaded-replies.user.js
 // ==/UserScript==
 
 // NOTE: change the match above to your own instance.
@@ -12,7 +15,8 @@
 
 const instanceURL = (new URL(window.location)).origin;
 const accessToken = JSON.parse(document.getElementById("initial-state").textContent).meta.access_token;
-const maxIndent = 15;
+
+const maxIndent = 10;
 let fails = 0;
 
 let loc = window.location.toString();
@@ -211,16 +215,19 @@ const indentReplies = function(json) {
 
 const locationChanged = async function() {
   const pathParts = window.location.pathname.split("/");
-  if (pathParts.length < 3) {
-    return;
+  if (pathParts.length < 4) {
+
+   return;
   }
-  if (!pathParts[1].startsWith("@")) {
-    return;
+  if (!pathParts[2].startsWith("@")) {
+
+   return;
   }
   // note: matching empty string is deliberate
-  if (!Number(pathParts[2])) {
-    return;
-  }
+  if (!Number(pathParts[3])) {
+
+      return;
+ }
 
   // use authorization, if logged in, to get posts only visible to logged in user
   const headers = {};
@@ -229,13 +236,13 @@ const locationChanged = async function() {
   }
 
   // same origin, shouldn't cause CORS issues
-  const resp = await fetch(`${instanceURL}/api/v1/statuses/${pathParts[2]}/context`, {headers: headers});
+  const resp = await fetch(`${instanceURL}/api/v1/statuses/${pathParts[3]}/context`, {headers: headers});
   const json = await resp.json();
 
   if (json.descendants.length > 0) {
     indentReplies(json);
   } else {
-    console.log("Empty JSON descendants array in response for", pathParts[2]);
+    console.log("Empty JSON descendants array in response for", pathParts[3]);
   }
 };
 
